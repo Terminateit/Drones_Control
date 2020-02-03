@@ -1,5 +1,23 @@
 ##Drones Regulator
 
+Download the regulator from Git
+
+```bash
+git clone <URL>
+```
+
+Compile changings (go to your catkin:
+
+```bash
+cd ~/<catkin_workspace>
+```
+
+```bash
+catkin_make
+```
+
+Run all:
+
 ```bash
 cd ~/src/Firmware
 ```
