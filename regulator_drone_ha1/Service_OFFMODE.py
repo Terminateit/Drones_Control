@@ -9,9 +9,21 @@ import numpy as np
 import math
 from tf.transformations import euler_from_quaternion
 
+from dynamic_reconfigure.msg import Config
+
+
+
 mavros.set_namespace()
 
 ## CALLBACK FUNCTRIONS
+
+# For dynamics reconfigure
+
+PDcoeffs = Config() 
+def PD_coeffs(doubles):
+    global PDcoeffs
+    PDcoeffs = doubles
+
 current_state = State() 
 offb_set_mode = SetMode
 def state_cb(state):
@@ -56,6 +68,7 @@ state_sub = rospy.Subscriber(mavros.get_topic('state'), State, state_cb)
 arming_client = rospy.ServiceProxy(mavros.get_topic('cmd', 'arming'), CommandBool)
 set_mode_client = rospy.ServiceProxy(mavros.get_topic('set_mode'), SetMode) 
 
+PD_sub = rospy.Subscriber('/PD/parameter_updates', Config, PD_coeffs)
 pose_sub = rospy.Subscriber(mavros.get_topic('local_position', 'pose'), PoseStamped, pose_cb)
 odom_sub = rospy.Subscriber(mavros.get_topic('local_position','odom'), Odometry, odom_cb)
 accel_sub = rospy.Subscriber(mavros.get_topic('local_position','accel'), AccelWithCovarianceStamped, acc_cb)
@@ -86,6 +99,11 @@ def position_control():
 
     # Check OFFBOAD or Armed
     while not rospy.is_shutdown():
+
+        p = PDcoeffs.doubles[1].value
+        d = PDcoeffs.doubles[0].value
+        print('Kp',p)
+        print('Kd',d)
         now = rospy.get_rostime()
         if current_state.mode != "OFFBOARD" and (now - last_request > rospy.Duration(5.)):
             set_mode_client(base_mode=0, custom_mode="OFFBOARD")
@@ -107,22 +125,30 @@ def position_control():
         phi_goal, theta_goal, tau_goal = euler_from_quaternion(orientation_goal)
 
         # Linear Velocity Control 
-        vel_control_x = p*(current_goal.pose.position.x-current_pose.pose.position.x)+d*(0-current_vel_loc.twist.linear.x)
-        vel_control_y = p*(current_goal.pose.position.y-current_pose.pose.position.y)+d*(0-current_vel_loc.twist.linear.y)
-        vel_control_z = p*(current_goal.pose.position.z-current_pose.pose.position.z)+d*(0-current_vel_loc.twist.linear.z)
+        vel_control_x = p*(current_goal.pose.position.x-current_pose.pose.position.x)+d*(0-current_vel_loc.twist.linear.x) + PDcoeffs.doubles[2].value
+
+        vel_control_y = p*(current_goal.pose.position.y-current_pose.pose.position.y)+d*(0-current_vel_loc.twist.linear.y) + PDcoeffs.doubles[3].value
+
+        vel_control_z = p*(current_goal.pose.position.z-current_pose.pose.position.z)+d*(0-current_vel_loc.twist.linear.z) + PDcoeffs.doubles[4].value
+
         vel_control.twist.linear.x = limit_number(vel_control_x,min = -2,max = 2)
         vel_control.twist.linear.y = limit_number(vel_control_y,min = -2,max = 2)
         vel_control.twist.linear.z = limit_number(vel_control_z,min = -1.5,max = 1.5)
         # Angular Velocity Control
         orientation = (current_pose.pose.orientation.x, current_pose.pose.orientation.y, current_pose.pose.orientation.z, current_pose.pose.orientation.w)
         phi, theta, tau  = euler_from_quaternion(orientation)
-
+       
         vel_control.twist.angular.x = 0
         vel_control.twist.angular.y = 0
-        vel_control.twist.angular.z = p*(tau_goal-tau)
+        vel_control.twist.angular.z = p*(tau_goal-tau) + PDcoeffs.doubles[5].value
         
         vel_control.header.stamp = rospy.Time.now()
         vel_cmd_pub.publish(vel_control)
+
+        print('Vx',PDcoeffs.doubles[2].value)
+        print('Vy',PDcoeffs.doubles[3].value)
+        print('Vz',PDcoeffs.doubles[4].value)
+        print('Wz',PDcoeffs.doubles[5].value)
         rate.sleep()
 
 
