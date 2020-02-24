@@ -1,5 +1,6 @@
-##Drones Regulator
-by Ilia Sevostianov, Daniil Kirsanov and Oleg Rodionov
+## Drones Regulator
+
+by Ilia Sevostianov & Daniil Kirsanov & Oleg Rodionov
 
 ## Steps:
 
