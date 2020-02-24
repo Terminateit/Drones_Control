@@ -6,7 +6,7 @@ from dynamic_reconfigure.server import Server
 from dynamic_tutorials.cfg import TutorialsConfig
 
 def callback(config, level):
-    rospy.loginfo("""Reconfigure Request: {Kp}, {Kd}""".format(**config))
+    rospy.loginfo("""Reconfigure Request: {Kp}, {Kd}, {Vx},{Vy},{Vz},{Wz}""".format(**config))
     return config
 
 if __name__ == "__main__":
