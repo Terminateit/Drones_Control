@@ -1,12 +1,20 @@
 ##Drones Regulator
+by Ilia Sevostianov, Daniil Kirsanov and Oleg Rodionov
+
+## Steps:
+
 
 Download the regulator from Git
+
+```bash
+cd ~/<catkin_workspace>/src/
+```
 
 ```bash
 git clone <URL>
 ```
 
-Compile changings (go to your catkin:
+Compile changings (go to your catkin_ws):
 
 ```bash
 cd ~/<catkin_workspace>
@@ -16,7 +24,18 @@ cd ~/<catkin_workspace>
 catkin_make
 ```
 
+```bash
+source devel/setup.bash
+```
+
+
+
 Run all:
+
+
+```bash
+cd ~/src/Firmware
+```
 
 ```bash
 cd ~/src/Firmware
@@ -35,6 +54,16 @@ roslaunch ground_control ground_control.launch
 ```
 
 Run qgroundcontrol
+
+Run dynamic reconfigurator
+
+```bash
+roslaunch dynamic_tutorials server.launch
+```
+
+```bash
+rosrun rqt_gui rqt_gui -s reconfigure
+```
 
 Run Regulator
 
