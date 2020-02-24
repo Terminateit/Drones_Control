@@ -104,20 +104,28 @@ def position_control():
         d = PDcoeffs.doubles[0].value
         print('Kp',p)
         print('Kd',d)
-        now = rospy.get_rostime()
-        if current_state.mode != "OFFBOARD" and (now - last_request > rospy.Duration(5.)):
-            set_mode_client(base_mode=0, custom_mode="OFFBOARD")
-            last_request = now 
-        else:
-            if not current_state.armed and (now - last_request > rospy.Duration(5.)):
-               arming_client(True)
-               last_request = now 
-        if prev_state.armed != current_state.armed:
-            rospy.loginfo("Vehicle armed: %r" % current_state.armed)
-        if prev_state.mode != current_state.mode: 
-            rospy.loginfo("Current mode: %s" % current_state.mode)
-        prev_state = current_state
+
+        ## Disable disable automatic flight mode switching and arming:
+
+        # now = rospy.get_rostime()
+        # if current_state.mode != "OFFBOARD" and (now - last_request > rospy.Duration(5.)):
+        #     set_mode_client(base_mode=0, custom_mode="OFFBOARD")
+        #     last_request = now 
+        # else:
+        # if not current_state.armed and (now - last_request > rospy.Duration(5.)):
+        #     arming_client(True)
+        #     last_request = now 
         
+        # if prev_state.armed != current_state.armed:
+        #     rospy.loginfo("Vehicle armed: %r" % current_state.armed)
+        # if prev_state.mode != current_state.mode: 
+        #     rospy.loginfo("Current mode: %s" % current_state.mode)
+        # prev_state = current_state
+
+
+        set_mode_client(base_mode=0, custom_mode="OFFBOARD")
+        arming_client(True)
+
         ## VELOCITY CONTROL
 
         # Get current coal point, orientation
