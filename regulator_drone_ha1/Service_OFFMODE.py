@@ -24,6 +24,11 @@ def PD_coeffs(doubles):
     global PDcoeffs
     PDcoeffs = doubles
 
+Twistnoise = Config() 
+def Twist_noise(doubles):
+    global Twistnoise
+    Twistnoise = doubles    
+
 current_state = State() 
 offb_set_mode = SetMode
 def state_cb(state):
@@ -68,7 +73,11 @@ state_sub = rospy.Subscriber(mavros.get_topic('state'), State, state_cb)
 arming_client = rospy.ServiceProxy(mavros.get_topic('cmd', 'arming'), CommandBool)
 set_mode_client = rospy.ServiceProxy(mavros.get_topic('set_mode'), SetMode) 
 
+#Dynamics Reconfiguration
 PD_sub = rospy.Subscriber('/PD/parameter_updates', Config, PD_coeffs)
+
+Twist_sub = rospy.Subscriber('/field/parameter_updates', Config, Twist_noise)
+
 pose_sub = rospy.Subscriber(mavros.get_topic('local_position', 'pose'), PoseStamped, pose_cb)
 odom_sub = rospy.Subscriber(mavros.get_topic('local_position','odom'), Odometry, odom_cb)
 accel_sub = rospy.Subscriber(mavros.get_topic('local_position','accel'), AccelWithCovarianceStamped, acc_cb)
@@ -100,8 +109,8 @@ def position_control():
     # Check OFFBOAD or Armed
     while not rospy.is_shutdown():
 
-        p = PDcoeffs.doubles[1].value
-        d = PDcoeffs.doubles[0].value
+        p = PDcoeffs.doubles[0].value
+        d = PDcoeffs.doubles[1].value
         print('Kp',p)
         print('Kd',d)
 
@@ -133,11 +142,11 @@ def position_control():
         phi_goal, theta_goal, tau_goal = euler_from_quaternion(orientation_goal)
 
         # Linear Velocity Control 
-        vel_control_x = p*(current_goal.pose.position.x-current_pose.pose.position.x)+d*(0-current_vel_loc.twist.linear.x) + PDcoeffs.doubles[2].value
+        vel_control_x = p*(current_goal.pose.position.x-current_pose.pose.position.x)+d*(0-current_vel_loc.twist.linear.x) + Twistnoise.doubles[0].value
 
-        vel_control_y = p*(current_goal.pose.position.y-current_pose.pose.position.y)+d*(0-current_vel_loc.twist.linear.y) + PDcoeffs.doubles[3].value
+        vel_control_y = p*(current_goal.pose.position.y-current_pose.pose.position.y)+d*(0-current_vel_loc.twist.linear.y) + Twistnoise.doubles[1].value
 
-        vel_control_z = p*(current_goal.pose.position.z-current_pose.pose.position.z)+d*(0-current_vel_loc.twist.linear.z) + PDcoeffs.doubles[4].value
+        vel_control_z = p*(current_goal.pose.position.z-current_pose.pose.position.z)+d*(0-current_vel_loc.twist.linear.z) + Twistnoise.doubles[2].value
 
         vel_control.twist.linear.x = limit_number(vel_control_x,min = -2,max = 2)
         vel_control.twist.linear.y = limit_number(vel_control_y,min = -2,max = 2)
@@ -148,15 +157,15 @@ def position_control():
        
         vel_control.twist.angular.x = 0
         vel_control.twist.angular.y = 0
-        vel_control.twist.angular.z = p*(tau_goal-tau) + PDcoeffs.doubles[5].value
+        vel_control.twist.angular.z = p*(tau_goal-tau) + Twistnoise.doubles[3].value
         
         vel_control.header.stamp = rospy.Time.now()
         vel_cmd_pub.publish(vel_control)
 
-        print('Vx',PDcoeffs.doubles[2].value)
-        print('Vy',PDcoeffs.doubles[3].value)
-        print('Vz',PDcoeffs.doubles[4].value)
-        print('Wz',PDcoeffs.doubles[5].value)
+        print('Vx',Twistnoise.doubles[0].value)
+        print('Vy',Twistnoise.doubles[1].value)
+        print('Vz',Twistnoise.doubles[2].value)
+        print('Wz',Twistnoise.doubles[3].value)
         rate.sleep()
 
 
