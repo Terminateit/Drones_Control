@@ -21,7 +21,7 @@ cd ~/ && source devel/setup.bash && gnome-terminal -- bash -c "rosrun rqt_gui rq
 
 sleep 5 &&
 
-cd ~/ && source devel/setup.bash && gnome-terminal -- bash -c "echo "Write the last command, please, by yourself""
+cd ~/ && source devel/setup.bash && gnome-terminal -- bash -c "echo "Write next command, please, by yourself"" 
 
 
 
