@@ -42,6 +42,8 @@ cd ~/src/Firmware
 make px4_sitl gazebo
 ```
 
+There are two options to run further:
+
 ## Option 1:
 
 ```bash
