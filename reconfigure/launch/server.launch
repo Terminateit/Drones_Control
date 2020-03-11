@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<launch>
+	<node pkg="reconfigure" name="reconfigure_server" type="reconfigure_server.py" output="screen" />
+</launch>

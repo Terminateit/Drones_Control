@@ -1,87 +1,25 @@
-## Drones Regulator
+# Drone control project
 
-by Ilia Sevostianov & Daniil Kirsanov & Oleg Rodionov
-
-## Steps:
-
-Download the regulator from Git
+To use this project, open a terminal and do the following:
 
 ```bash
-cd ~/<catkin_workspace>/src/
+$ cd ~/catkin_workspace/src
+$ git clone git@github.com:Terminateit/Drones_Control.git
+$ cd ..
+$ catkin_make
+$ source devel/setup.bash
 ```
-
+The preliminary commands:
 ```bash
-git clone <URL>
-```
-
-Compile changings (go to your catkin_ws):
-
-```bash
-cd ~/<catkin_workspace>
-```
-
-```bash
-catkin_make
-```
-
-```bash
-source devel/setup.bash
-```
-
-
-
-Run all:
-
-
-```bash
-cd ~/src/Firmware
-```
-
-
-```bash
-make px4_sitl gazebo
-```
-
-There are two options to run further:
-
-## Option 1:
-
-```bash
-roslaunch mavros px4.launch fcu_url:="udp://:14540@192.168.1.36:14557"
+roslaunch drone_sim forest_sim.launch 
 ```
 
 ```bash
 roslaunch ground_control ground_control.launch
 ```
 
-Run qgroundcontrol
-
-Run dynamic reconfigurator:
+You can run the controller using the following command:
 
 ```bash
-roslaunch dynamic_tutorials server.launch
-```
-
-```bash
-rosrun rqt_gui rqt_gui -s reconfigure
-```
-
-Run Regulator:
-
-```bash
-rosrun regulator_drone_ha1 Service_OFFMODE.py
-```
-
-## Option 2:
-
-```bash
-~/src/Drones_Control/./run_all.bash
-```
-
-Run qgroundcontrol
-
-Run Regulator:
-
-```bash
-rosrun regulator_drone_ha1 Service_OFFMODE.py
+$ roslaunch controller controller.launch
 ```

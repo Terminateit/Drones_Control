@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<package format="2">
+  <name>field</name>
+  <version>0.0.1</version>
+  <description>Potential field package</description>
+
+  <license>MIT</license>
+
+  <maintainer email="dankirsdot@gmail.com">Daniil Kirsanov</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>
