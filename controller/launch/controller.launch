@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<launch>
+	<include file="$(find reconfigure)/launch/server.launch" />
+	<node name = "rqt_dashboard" pkg = "rqt_gui" type = "rqt_gui" respawn = "false" output = "screen" args = "-s reconfigure"/>
+	<include file="$(find field)/launch/field.launch" />
+	<node pkg="controller" name="controller" type="controller.py" output="screen" />
+</launch>
